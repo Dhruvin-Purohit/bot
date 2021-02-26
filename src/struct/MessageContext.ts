@@ -54,7 +54,10 @@ export class MessageContext {
 		},
 	) {
 		let msg = await this.send(message.content, message.options);
-		if (Array.isArray(msg)) msg = msg[0];
+		if (Array.isArray(msg)){
+			if(!msg[0]) return undefined
+			msg = msg[0];
+		}
 		let rctn = await msg.react(deleteable.emoji);
 		let resp: Collection<string, MessageReaction>;
 		try {
@@ -72,12 +75,12 @@ export class MessageContext {
 		} catch (e) {
 			return rctn.remove();
 		}
-		return resp ? resp.first().message.delete() : undefined;
+		return resp ? resp.first()?.message.delete() : undefined;
 	}
 
 	public async init(): Promise<MessageContext> {
 		if (this.message.partial) await this.message.fetch();
-		if (this.member.partial) await this.member.fetch();
+		if (this.member?.partial) await this.member.fetch();
 		if (this.author.partial) await this.author.fetch();
 		if (this.channel.type === 'dm') {
 			if (this.channel.partial) await this.channel.fetch();
@@ -91,7 +94,7 @@ export class MessageContext {
 	 */
 	public embed(data: MessageEmbed | MessageEmbedOptions | undefined) {
 		return new MessageEmbed(data)
-			.setColor(/*this.client.baseColor*/ "") //default color for embeds
+			.setColor(this.client.baseColor) //default color for embeds
 			.setTimestamp(new Date());
 	}
 }
