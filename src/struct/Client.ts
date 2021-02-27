@@ -1,9 +1,8 @@
-import { AkairoClient } from 'discord-akairo';
-import { IntentsString } from 'discord.js';
-import { BitFieldResolvable } from 'discord.js';
-import { PresenceData } from 'discord.js';
-import { PartialTypes } from 'discord.js';
-import { Intents } from 'discord.js';
+import { CommandHandler, AkairoClient } from 'discord-akairo';
+import { IntentsString, BitFieldResolvable, PresenceData, PartialTypes, Intents } from 'discord.js';
+import { join } from 'path';
+import { content } from '../constants/data/base';
+import { data } from '../constants/data/dev-config';
 
 declare module 'discord-akairo' {
 	interface AkairoClient {
@@ -44,7 +43,21 @@ export class Client extends AkairoClient {
 	}
 	public baseColor = '';
 
+	public CommandHandler = new CommandHandler(this, {
+		directory: join(__dirname, "..", "commands"),
+		prefix: content.bot.prefix,
+		aliasReplacement: /-/g,
+		allowMention: true,
+		handleEdits: true,
+		commandUtil: true,
+		ignoreCooldown: data.bot.owners,
+		ignorePermissions: data.bot.owners,
+		automateCategories: true,
+		//prompts are being skipped atm.
+	})
+
 	public async start() {
+		this.CommandHandler.loadAll()
 		//Command handler initiation etc goes above this, this goes at the end. nothing after this.
 		return await this.login(this.token);
 	}

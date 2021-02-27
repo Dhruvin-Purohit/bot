@@ -1,11 +1,10 @@
 import { AkairoClient } from 'discord-akairo';
+import { debug } from '../constants/data/emojis';
 import {
-	Collection,
 	EmojiIdentifierResolvable,
 	Message,
 	MessageEmbed,
 	MessageOptions,
-	MessageReaction,
 	MessageEmbedOptions,
 } from 'discord.js';
 
@@ -15,7 +14,11 @@ export class MessageContext {
 		this.message = message;
 	}
 
-	public async send(content: string | MessageEmbed, options: MessageOptions) {
+	public async send(content?: string | MessageEmbed, options: MessageOptions = {}) {
+		if (content instanceof MessageEmbed) {
+			options = {...options, embed: content};
+			content = undefined;
+		}
 		return await this.message.channel.send(content, options);
 	}
 
@@ -39,18 +42,22 @@ export class MessageContext {
 		return this.message.member;
 	}
 
+	public get language(): MessageContextLanguage {//TODO
+		return undefined || 'EN-US'
+	}
+
 	/**
 	 * Sends a message that is deleteable with a reaction to the message.
 	 */
 	public async sendDeleteable(
 		message: {
-			content: string | MessageEmbed;
-			options: MessageOptions;
+			content?: string | MessageEmbed;
+			options?: MessageOptions;
 		},
 		deleteable: {
-			emoji: EmojiIdentifierResolvable;
+			emoji?: EmojiIdentifierResolvable;
 			userIDs: string | string[];
-			time: number;
+			time?: number;
 		},
 	) {
 		let msg = await this.send(message.content, message.options);
@@ -58,12 +65,12 @@ export class MessageContext {
 			if(!msg[0]) return undefined
 			msg = msg[0];
 		}
-		let rctn = await msg.react(deleteable.emoji);
-		let resp: Collection<string, MessageReaction>;
+		let emoji = deleteable.emoji || debug.bin
+		let rctn = await msg.react(emoji);
 		try {
-			resp = await msg.awaitReactions(
-				(reaction, user) =>
-					reaction.emoji.name === rctn.emoji.name &&
+			let confirmation = msg.awaitReactions(
+				(reaction, user) =>//the next line, (Line 69) is where this thing breaks, i fucking hate how bad discord.js has made this.
+					reaction.emoji.name === emoji &&
 					Array.isArray(deleteable.userIDs)
 						? deleteable.userIDs.includes(user.id)
 						: user.id === deleteable.userIDs,
@@ -71,11 +78,14 @@ export class MessageContext {
 					time: deleteable.time || 60 * 1000, //1 minute
 					errors: ['time'],
 				},
-			);
+			)
+			if(await confirmation) return await msg.delete();
+			else {
+				return await rctn.remove();
+			}
 		} catch (e) {
-			return rctn.remove();
+			return await rctn.remove();
 		}
-		return resp ? resp.first()?.message.delete() : undefined;
 	}
 
 	public async init(): Promise<MessageContext> {
@@ -92,9 +102,12 @@ export class MessageContext {
 	 * Returns a MessageEmbed with default color for client and timestamp
 	 * Warning: The color and timestamp are overridden so you will have to reinitialize them.
 	 */
-	public embed(data: MessageEmbed | MessageEmbedOptions | undefined) {
+	public embed(data?: MessageEmbed | MessageEmbedOptions | undefined) {
 		return new MessageEmbed(data)
 			.setColor(this.client.baseColor) //default color for embeds
 			.setTimestamp(new Date());
 	}
 }
+
+
+export type MessageContextLanguage = 'EN-US'
