@@ -1,5 +1,7 @@
 import { AkairoClient } from 'discord-akairo';
 import { debug } from '../constants/data/emojis';
+import { languages } from '../constants/texts/locale';
+
 import {
 	EmojiIdentifierResolvable,
 	Message,
@@ -14,17 +16,20 @@ export class MessageContext {
 		this.message = message;
 	}
 
-	public async send(content?: string | MessageEmbed, options: MessageOptions = {}) {
+	public async send(
+		content?: string | MessageEmbed,
+		options: MessageOptions = {},
+	) {
 		if (content instanceof MessageEmbed) {
-			options = {...options, embed: content};
+			options = { ...options, embed: content };
 			content = undefined;
 		}
 		return await this.message.channel.send(content, options);
 	}
 
-    public get client() {
-        return this.message.client as AkairoClient
-    }
+	public get client() {
+		return this.message.client as AkairoClient;
+	}
 
 	public get author() {
 		return this.message.author;
@@ -42,8 +47,9 @@ export class MessageContext {
 		return this.message.member;
 	}
 
-	public get language(): MessageContextLanguage {//TODO
-		return undefined || 'EN-US'
+	public get locale() {
+		//TODO
+		return languages['EN-US'];
 	}
 
 	/**
@@ -61,15 +67,18 @@ export class MessageContext {
 		},
 	) {
 		let msg = await this.send(message.content, message.options);
-		if (Array.isArray(msg)){
-			if(!msg[0]) return undefined
+		if (Array.isArray(msg)) {
+			if (!msg[0]) return undefined;
 			msg = msg[0];
 		}
-		let emoji = deleteable.emoji || debug.bin
+		let emoji = deleteable.emoji || debug.bin;
 		let rctn = await msg.react(emoji);
 		try {
 			let confirmation = msg.awaitReactions(
-				(reaction, user) =>//the next line, (Line 69) is where this thing breaks, i fucking hate how bad discord.js has made this.
+				(
+					reaction,
+					user, //the next line, (Line 69) is where this thing breaks, i fucking hate how bad discord.js has made this.
+				) =>
 					reaction.emoji.name === emoji &&
 					Array.isArray(deleteable.userIDs)
 						? deleteable.userIDs.includes(user.id)
@@ -78,8 +87,8 @@ export class MessageContext {
 					time: deleteable.time || 60 * 1000, //1 minute
 					errors: ['time'],
 				},
-			)
-			if(await confirmation) return await msg.delete();
+			);
+			if (await confirmation) return await msg.delete();
 			else {
 				return await rctn.remove();
 			}
@@ -108,6 +117,3 @@ export class MessageContext {
 			.setTimestamp(new Date());
 	}
 }
-
-
-export type MessageContextLanguage = 'EN-US'

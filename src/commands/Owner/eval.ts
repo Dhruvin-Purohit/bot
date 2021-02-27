@@ -2,7 +2,6 @@ import { Command } from 'discord-akairo';
 import { Message } from 'discord.js';
 import { inspect } from 'util';
 import { MessageContext } from '../../struct/MessageContext';
-import { languages } from '../../constants/texts/locale';
 
 export default class extends Command {
 	public constructor() {
@@ -38,7 +37,6 @@ export default class extends Command {
 	) {
 		let ctx = new MessageContext(message);
 
-		let locale = languages[ctx.language];
 		let resp: string;
 		let err = false;
 
@@ -47,7 +45,7 @@ export default class extends Command {
 		}
 		let embed = ctx
 			.embed()
-			.setFooter(locale.COMMAND.EVAL.EMBED_FOOTER(ctx));
+			.setFooter(ctx.locale.COMMAND.EVAL.EMBED_FOOTER(ctx));
 
 		try {
 			if (
@@ -75,17 +73,19 @@ export default class extends Command {
 		let len = `\`\`\`js\n${resp}\n\`\`\``.length;
 
 		embed
-			.setTitle(locale.COMMAND.EVAL.EMBED_TITLE(err))
+			.setTitle(ctx.locale.COMMAND.EVAL.EMBED_TITLE(err))
 			.setDescription(
 				`\`\`\`js\n${resp.substr(0, 2038) || '\u200b'}\n\`\`\``,
 			)
 			.setColor(err ? 'RED' : 'GREEN');
 
 		if (len >= 2049) {
-			console.log(locale.COMMAND.EVAL.CONSOLE_RESPONSE(ctx, len, resp));
+			console.log(
+				ctx.locale.COMMAND.EVAL.CONSOLE_RESPONSE(ctx, len, resp),
+			);
 			embed.addField(
-				locale.COMMAND.EVAL.EMBED_FIELD_TOO_LONG_TITLE,
-				locale.COMMAND.EVAL.EMBED_FIELD_TOO_LONG_VALUE(len),
+				ctx.locale.COMMAND.EVAL.EMBED_FIELD_TOO_LONG_TITLE,
+				ctx.locale.COMMAND.EVAL.EMBED_FIELD_TOO_LONG_VALUE(len),
 			);
 		}
 
