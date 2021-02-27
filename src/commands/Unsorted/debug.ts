@@ -27,7 +27,7 @@ export default class extends Command {
 		};
 
 		if (!ctx.guild || !ctx.guild.me)
-			return ctx.send(ctx.locale.COMMAND.DEBUG.NON_GUILD_DEBUG_INFO);
+			return ctx.send(ctx.locale.COMMAND.DEBUG.NON_GUILD_DEBUG_INFO(ctx, this.handler));
 
 		return await ctx.send(
 			ctx.locale.COMMAND.DEBUG.GUILD_DEBUG_INFO(

@@ -40,7 +40,16 @@ export let languages = {
                     `\`        Send Embeds\`` + "    " + `${ctx.guild!.me!.hasPermission('EMBED_LINKS') ? emojis.check : emojis.cross}`
                     return str
                 },
-                NON_GUILD_DEBUG_INFO: 'TODO'
+                NON_GUILD_DEBUG_INFO(ctx: MessageContext, cmdh: CommandHandler) {
+                    let str = `This is the debug menu. This can be used to check if the bot is functioning properly.\n` +
+                    `\n\n` +
+                    `**Miscellaneous Information**\n\n` +
+                    `\`         Bot Prefix\`` + "    " + `\`${cmdh.prefix}\`` + `\n` +
+                    `\`            User ID\`` + "    " + `\`${ctx.author.id}\`` + `\n` +
+                    `\`        API Latency\`` + "    " + `\`${ctx.message.client.ws.ping}\`` +
+                    `\`        Bot Latency\`` + "    " + `\`GOTTA DO THAT PING THING HERE\``
+                    return str
+                }
             }
 		},
 	},
