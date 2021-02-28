@@ -12,23 +12,21 @@ export default class extends Command {
 
 	public async exec(message: Message) {
 		let ctx = new MessageContext(message);
+		await ctx.init()
 
 		let emojis = {
-			check: !ctx.guild
-				? `${debug.checkmark}`
-				: ctx.guild.me?.hasPermission('USE_EXTERNAL_EMOJIS')
+			check: ctx.hasPermissionInChannel(
+				'USE_EXTERNAL_EMOJIS'
+			)
 				? `${debug.checkmark}`
 				: `✔️`,
-			cross: !ctx.guild
-				? `${debug.crossmark}`
-				: ctx.guild.me?.hasPermission('USE_EXTERNAL_EMOJIS')
+			cross: ctx.hasPermissionInChannel(
+				'USE_EXTERNAL_EMOJIS'
+			)
 				? `${debug.crossmark}`
 				: `❌`,
 		};
-
-		if (!ctx.guild || !ctx.guild.me)
-			return ctx.send(ctx.locale.COMMAND.DEBUG.NON_GUILD_DEBUG_INFO(ctx, this.handler));
-
+//this thing checks for non-guild etc, nothing should go after this.
 		return await ctx.send(
 			ctx.locale.COMMAND.DEBUG.GUILD_DEBUG_INFO(
 				ctx,

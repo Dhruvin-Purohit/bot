@@ -21,23 +21,31 @@ export let languages = {
 				},
 			},
             DEBUG: {
-                GUILD_DEBUG_INFO(ctx: MessageContext,emojis: {check: string,cross: string}, cmdh: CommandHandler) {
+                GUILD_DEBUG_INFO(ctx: MessageContext, emojis: {check: string, cross: string}, cmdh: CommandHandler) {
+                    if(!ctx.guild || !ctx.guild.me) return this.NON_GUILD_DEBUG_INFO(ctx, cmdh)
                     let str = `This is the debug menu. This can be used to check if the bot has permissions that are needed for proper functioning.\n` +
                     `\n\n` +
                     `**Miscellaneous Information**\n\n` +
                     `\`         Bot Prefix\`` + "    " + `\`${cmdh.prefix}\`` + `\n` +
                     `\`            User ID\`` + "    " + `\`${ctx.author.id}\`` + `\n` +
                     `\`         Channel ID\`` + "    " + `\`${ctx.channel.id}\`` + `\n` +
-                    `\`          Server ID\`` + "    " + `\`${ctx.guild!.id}\`` + `\n` +
+                    `\`          Server ID\`` + "    " + `\`${ctx.guild.id}\`` + `\n` +
                     `\`        API Latency\`` + "    " + `\`${ctx.message.client.ws.ping}\`` +
                     `\`        Bot Latency\`` + "    " + `\`GOTTA DO THAT PING THING HERE\`` +
                     `\n\n` + 
                     `**Server Permissions**\n\n` +
-                    `\`      Send Messages\`` + "    " + `${ctx.guild!.me!.hasPermission('SEND_MESSAGES') ? emojis.check : emojis.cross}` + `\n` +
-                    `\`       View Channel\`` + "    " + `${ctx.guild!.me!.hasPermission('VIEW_CHANNEL') ? emojis.check : emojis.cross}` + `\n` +
-                    `\`Use External Emojis\`` + "    " + `${ctx.guild!.me!.hasPermission('USE_EXTERNAL_EMOJIS') ? emojis.check : emojis.cross}` + `\n` +
-                    `\`      Add Reactions\`` + "    " + `${ctx.guild!.me!.hasPermission('ADD_REACTIONS') ? emojis.check : emojis.cross}` + `\n` +
-                    `\`        Send Embeds\`` + "    " + `${ctx.guild!.me!.hasPermission('EMBED_LINKS') ? emojis.check : emojis.cross}`
+                    `\`      Send Messages\`` + "    " + `${ctx.hasPermission('SEND_MESSAGES') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`       View Channel\`` + "    " + `${ctx.hasPermission('VIEW_CHANNEL') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`Use External Emojis\`` + "    " + `${ctx.hasPermission('USE_EXTERNAL_EMOJIS') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`      Add Reactions\`` + "    " + `${ctx.hasPermission('ADD_REACTIONS') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`        Send Embeds\`` + "    " + `${ctx.hasPermission('EMBED_LINKS') ? emojis.check : emojis.cross}` +
+                    `\n\n` +
+                    `**Channel Permissions**\n\n` +
+                    `\`      Send Messages\`` + "    " + `${ctx.hasPermissionInChannel('SEND_MESSAGES') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`       View Channel\`` + "    " + `${ctx.hasPermissionInChannel('VIEW_CHANNEL') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`Use External Emojis\`` + "    " + `${ctx.hasPermissionInChannel('USE_EXTERNAL_EMOJIS') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`      Add Reactions\`` + "    " + `${ctx.hasPermissionInChannel('ADD_REACTIONS') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`        Send Embeds\`` + "    " + `${ctx.hasPermissionInChannel('EMBED_LINKS') ? emojis.check : emojis.cross}`
                     return str
                 },
                 NON_GUILD_DEBUG_INFO(ctx: MessageContext, cmdh: CommandHandler) {

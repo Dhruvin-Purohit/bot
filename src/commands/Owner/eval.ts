@@ -36,6 +36,9 @@ export default class extends Command {
 		}: { silent: boolean; del: boolean; toEval: string },
 	) {
 		let ctx = new MessageContext(message);
+		await ctx.init()
+
+		toEval = ctx.parseStringFromCodeBlock(toEval)
 
 		let resp: string;
 		let err = false;

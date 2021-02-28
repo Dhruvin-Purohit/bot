@@ -2,17 +2,23 @@ import { AkairoClient } from 'discord-akairo';
 import { debug } from '../constants/data/emojis';
 import { languages } from '../constants/texts/locale';
 
-import {
-	EmojiIdentifierResolvable,
-	Message,
-	MessageEmbed,
-	MessageOptions,
-	MessageEmbedOptions,
-} from 'discord.js';
+import { Message } from 'discord.js';
+import { MessageOptions } from 'discord.js'
+import { MessageEmbed } from 'discord.js'
+import { TextChannel } from 'discord.js';
+import { NewsChannel } from 'discord.js';
+import { DMChannel } from 'discord.js';
+import { User } from 'discord.js';
+import { GuildMember } from 'discord.js';
+import { Role } from 'discord.js';
+import { PermissionResolvable } from 'discord.js';
+import { MessageReaction } from 'discord.js';
+import { BaseContext } from './BaseContext';
 
-export class MessageContext {
+export class MessageContext extends BaseContext {
 	public message: Message;
 	public constructor(message: Message) {
+		super(message.client as AkairoClient)
 		this.message = message;
 	}
 
@@ -26,10 +32,8 @@ export class MessageContext {
 		}
 		return await this.message.channel.send(content, options);
 	}
-
-	public get client() {
-		return this.message.client as AkairoClient;
-	}
+	//I guess ths will do it? because now it has to be defined
+	public client: AkairoClient = this.client!
 
 	public get author() {
 		return this.message.author;
@@ -47,9 +51,22 @@ export class MessageContext {
 		return this.message.member;
 	}
 
+	//not the same, this one will invlolve going through db and all.
 	public get locale() {
 		//TODO
 		return languages['EN-US'];
+	}
+
+	public hasPermission(perm: PermissionResolvable) {
+		if(!this.guild) return true
+		return this.guild.me?.hasPermission(perm) || false
+	}
+
+	public hasPermissionInChannel(perm: PermissionResolvable, thing?: string | Message | User | GuildMember | Role | null, chn?: TextChannel|NewsChannel|DMChannel): boolean {
+		if(!chn) chn = this.channel
+		if(chn instanceof DMChannel) return true
+		if(!thing) thing = this.client.user!
+		return chn.permissionsFor(thing)?.has(perm) || false
 	}
 
 	/**
@@ -61,7 +78,7 @@ export class MessageContext {
 			options?: MessageOptions;
 		},
 		deleteable: {
-			emoji?: EmojiIdentifierResolvable;
+			emoji?: string;
 			userIDs: string | string[];
 			time?: number;
 		},
@@ -76,8 +93,8 @@ export class MessageContext {
 		try {
 			let confirmation = msg.awaitReactions(
 				(
-					reaction,
-					user, //the next line, (Line 69) is where this thing breaks, i fucking hate how bad discord.js has made this.
+					reaction: MessageReaction,
+					user: User, //the next line, (Line 69) is where this thing breaks, i fucking hate how bad discord.js has made this.
 				) =>
 					reaction.emoji.name === emoji &&
 					Array.isArray(deleteable.userIDs)
@@ -98,22 +115,9 @@ export class MessageContext {
 	}
 
 	public async init(): Promise<MessageContext> {
-		if (this.message.partial) await this.message.fetch();
-		if (this.member?.partial) await this.member.fetch();
-		if (this.author.partial) await this.author.fetch();
-		if (this.channel.type === 'dm') {
-			if (this.channel.partial) await this.channel.fetch();
-		}
+		await this.fetchTheseIfPartial(this.message, this.author, this.member, this.channel)
+		await this.fetchIfPartial(this.message)
 		return this;
 	}
 
-	/**
-	 * Returns a MessageEmbed with default color for client and timestamp
-	 * Warning: The color and timestamp are overridden so you will have to reinitialize them.
-	 */
-	public embed(data?: MessageEmbed | MessageEmbedOptions | undefined) {
-		return new MessageEmbed(data)
-			.setColor(this.client.baseColor) //default color for embeds
-			.setTimestamp(new Date());
-	}
 }
