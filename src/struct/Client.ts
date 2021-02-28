@@ -1,6 +1,6 @@
-import { ListenerHandler } from 'discord-akairo';
-import { InhibitorHandler } from 'discord-akairo';
 import { CommandHandler } from 'discord-akairo';
+import { InhibitorHandler } from 'discord-akairo';
+import { ListenerHandler } from 'discord-akairo';
 import { AkairoClient } from 'discord-akairo';
 import { IntentsString, BitFieldResolvable, PresenceData, PartialTypes, Intents } from 'discord.js';
 import { join } from 'path';
@@ -9,6 +9,8 @@ import { data } from '../constants/data/dev-config';
 
 declare module 'discord-akairo' {
 	interface AkairoClient {
+		ListenerHandler: ListenerHandler
+		InhibitorHandler: InhibitorHandler
 		CommandHandler: CommandHandler
 		baseColor: string | number;
 		token: string;
