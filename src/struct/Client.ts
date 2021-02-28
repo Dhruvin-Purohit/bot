@@ -1,4 +1,7 @@
-import { CommandHandler, AkairoClient } from 'discord-akairo';
+import { ListenerHandler } from 'discord-akairo';
+import { InhibitorHandler } from 'discord-akairo';
+import { CommandHandler } from 'discord-akairo';
+import { AkairoClient } from 'discord-akairo';
 import { IntentsString, BitFieldResolvable, PresenceData, PartialTypes, Intents } from 'discord.js';
 import { join } from 'path';
 import { content } from '../constants/data/base';
@@ -6,6 +9,7 @@ import { data } from '../constants/data/dev-config';
 
 declare module 'discord-akairo' {
 	interface AkairoClient {
+		CommandHandler: CommandHandler
 		baseColor: string | number;
 		token: string;
 	}
@@ -43,7 +47,7 @@ export class Client extends AkairoClient {
 	}
 	public baseColor = '';
 
-	public CommandHandler = new CommandHandler(this, {
+	public CommandHandler: CommandHandler = new CommandHandler(this, {
 		directory: join(__dirname, "..", "commands"),
 		prefix: content.bot.prefix,
 		aliasReplacement: /-/g,
@@ -56,8 +60,22 @@ export class Client extends AkairoClient {
 		//prompts are being skipped atm.
 	})
 
+	public ListenerHandler: ListenerHandler = new ListenerHandler(this, {
+		directory: join(__dirname, "..", "listeners"),
+		automateCategories: true
+	})
+
+	public InhibitorHandler: InhibitorHandler = new InhibitorHandler(this, {
+		directory: join(__dirname, "..", "inhibitors"),
+		automateCategories: true
+	})
+
 	public async start() {
 		this.CommandHandler.loadAll()
+		this.ListenerHandler.loadAll()
+		this.InhibitorHandler.loadAll()
+		this.CommandHandler.useListenerHandler(this.ListenerHandler)
+		this.CommandHandler.useInhibitorHandler(this.InhibitorHandler)
 		//Command handler initiation etc goes above this, this goes at the end. nothing after this.
 		return await this.login(this.token);
 	}

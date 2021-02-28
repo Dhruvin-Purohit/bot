@@ -78,7 +78,7 @@ export default class extends Command {
 		embed
 			.setTitle(ctx.locale.COMMAND.EVAL.EMBED_TITLE(err))
 			.setDescription(
-				`\`\`\`js\n${resp.substr(0, 2038) || '\u200b'}\n\`\`\``,
+				`\`\`\`js\n${ctx.reduceString(resp, 2038, false) || '\u200b'}\n\`\`\``,
 			)
 			.setColor(err ? 'RED' : 'GREEN');
 

@@ -30,8 +30,9 @@ export class BaseContext {
 		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 	}
 
-	public reduceString(str: string, len: number = 2000) {
-		return str.length > len ? `${str.substr(0, len - 3)}...` : str;
+	public reduceString(str: string, len: number = 2000, use3dots?: boolean) {
+        if(!use3dots) use3dots = true
+		return str.length > len ? `${str.substr(0, use3dots ? len - 3 : len)}${use3dots ? "..." : ""}` : str;
 	}
 
 	public wait(timeInMS: number) {
