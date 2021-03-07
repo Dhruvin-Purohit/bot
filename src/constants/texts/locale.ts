@@ -61,4 +61,63 @@ export let languages = {
             }
 		},
 	},
+
+	'TR': {
+		COMMAND: {
+			EVAL: {
+				EMBED_FOOTER(ctx: MessageContext) {
+					return `Eval komudu ${ctx.author.tag} tarafından yürütüldü`;
+				},
+				EMBED_TITLE(err: boolean) {
+					return err ? 'HATA' : 'BAŞARILI';
+				},
+				CONSOLE_RESPONSE(ctx: MessageContext, len: number, resp: string,) {
+					return ` ${ctx.author.tag} tarafından yürütülen eval komudunun yanıtı çok uzun (${len}/2048) Yanıt :\n${resp}`;
+				},
+				EMBED_FIELD_TOO_LONG_TITLE: 'Not:',
+				EMBED_FIELD_TOO_LONG_VALUE(len: number) {
+					return `Yanıtı çok uzundu (\`${len}/2048\` uzunluğundaydı). Konsola kayıt edildi`;
+				},
+			},
+            DEBUG: {
+                GUILD_DEBUG_INFO(ctx: MessageContext, emojis: {check: string, cross: string}, cmdh: CommandHandler) {
+                    if(!ctx.guild || !ctx.guild.me) return this.NON_GUILD_DEBUG_INFO(ctx, cmdh)
+                    let str = `Bu hata ayıklama menüsüdür. Botun doğru çalışması için gereken yetkilere sahip olup olmadığını kontrol etmek için kullanılabilir.\n` +
+                    `\n\n` +
+                    `**Çeşitli Bilgiler**\n\n` +
+                    `\`         Bot'un Prefix'i\`` + "    " + `\`${cmdh.prefix}\`` + `\n` +
+                    `\`         Kullanıcı ID\`` + "    " + `\`${ctx.author.id}\`` + `\n` +
+                    `\`         Kanal ID\`` + "    " + `\`${ctx.channel.id}\`` + `\n` +
+                    `\`         Sunucu ID\`` + "    " + `\`${ctx.guild.id}\`` + `\n` +
+                    `\`         API Gecikmesi\`` + "    " + `\`${ctx.message.client.ws.ping}\`` +
+                    `\`         Bot'un Gecikmesi\`` + "    " + `\`GOTTA DO THAT PING THING HERE\`` +
+                    `\n\n` + 
+                    `**Sunucu Yetkileri**\n\n` +
+                    `\`      Mesaj Gönder\`` + "    " + `${ctx.hasPermission('SEND_MESSAGES') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`       Kanalları Görüntüle\`` + "    " + `${ctx.hasPermission('VIEW_CHANNEL') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`Harici Emojiler Kullan\`` + "    " + `${ctx.hasPermission('USE_EXTERNAL_EMOJIS') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`      Tepki Ekle\`` + "    " + `${ctx.hasPermission('ADD_REACTIONS') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`      Embed Gönder\`` + "    " + `${ctx.hasPermission('EMBED_LINKS') ? emojis.check : emojis.cross}` +
+                    `\n\n` +
+                    `**Kanal Yetkileri**\n\n` +
+                    `\`      Mesaj Gönder\`` + "    " + `${ctx.hasPermissionInChannel('SEND_MESSAGES') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`      Kanalları Görüntüle\`` + "    " + `${ctx.hasPermissionInChannel('VIEW_CHANNEL') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`Harici Emojiler Kullan\`` + "    " + `${ctx.hasPermissionInChannel('USE_EXTERNAL_EMOJIS') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`     Tepki Ekle\`` + "    " + `${ctx.hasPermissionInChannel('ADD_REACTIONS') ? emojis.check : emojis.cross}` + `\n` +
+                    `\`     Embed Gönder\`` + "    " + `${ctx.hasPermissionInChannel('EMBED_LINKS') ? emojis.check : emojis.cross}`
+                    return str
+                },
+                NON_GUILD_DEBUG_INFO(ctx: MessageContext, cmdh: CommandHandler) {
+                    let str = `Bu hata ayıklama menüsüdür. Botun doğru çalışması için gereken yetkilere sahip olup olmadığını kontrol etmek için kullanılabilir.\n` +
+                    `\n\n` +
+                    `**Miscellaneous Information**\n\n` +
+                    `\`         Bot'un Prefix'i\`` + "    " + `\`${cmdh.prefix}\`` + `\n` +
+                    `\`            Kullanıcı ID\`` + "    " + `\`${ctx.author.id}\`` + `\n` +
+                    `\`        API Gecikmesi\`` + "    " + `\`${ctx.message.client.ws.ping}\`` +
+                    `\`        Bot Gecikmesi\`` + "    " + `\`GOTTA DO THAT PING THING HERE\``
+                    return str
+                }
+            }
+		},
+	},
 };
